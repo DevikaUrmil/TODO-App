@@ -1,7 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:todo/Binding.dart';
+//import 'package:hive_generator/hive_generator.dart';
+//import 'package:build_runner/build_runner.dart';
+import 'package:todo/ModelClass/TodoModelClass.dart';
+import 'package:get/get.dart';
+import 'package:todo/View/DetailController.dart';
+import 'package:todo/View/DetailVC.dart';
+import 'package:todo/View/TodoController.dart';
+import 'package:todo/View/TodoVC.dart';
+import 'package:todo/View/UserController.dart';
+import 'package:todo/View/UserVC.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  await Hive.initFlutter();
+  Get.lazyPut(() => UserController(), fenix: true);
+  Get.lazyPut(() => TodoController(), fenix: true);
+  Get.lazyPut(() => DetailController(), fenix: true);
+
+  Hive.registerAdapter(TodoModelClassAdapter());
+
+  runApp(GetMaterialApp(
+    home: UserVC(),
+    debugShowCheckedModeBanner: false,
+    initialBinding: Binding(),
+    title: 'TODO',
+    getPages: [
+      GetPage(
+          name: "/user",
+          page: () => UserVC(),
+          binding: Binding(),
+          children: [
+            GetPage(
+              name: '/todo',
+              page: () => TodoVC(),
+              binding: TodoBinding(),
+              // transition: Transition.leftToRightWithFade,
+              // transitionDuration: Duration(milliseconds: 500),
+            ),
+            GetPage(
+              name: '/detail',
+              page: () => DetailVC(),
+              binding: DetailBinding(),
+            ),
+          ]),
+    ],
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -23,15 +68,6 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -40,53 +76,26 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  Box<TodoModelClass>? todoBox;
 
   void _incrementCounter() {
+    Hive.openBox<TodoModelClass>('Todo');
+    todoBox = Hive.box<TodoModelClass>('Todo');
+
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       _counter++;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
@@ -96,6 +105,58 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            FloatingActionButton(
+              onPressed: () {
+                Box<TodoModelClass> todoBox = Hive.box<TodoModelClass>('Todo');
+                print(todoBox);
+              },
+              tooltip: "Get",
+              child: Text("Get"),
+            ),
+            FloatingActionButton(
+              onPressed: () async {
+                var todoModel = TodoModelClass(
+                    "title", "description", "status", 1); //creating object
+                await todoBox?.put(
+                    todoModel.title, todoModel); //putting object into hive box
+              },
+              tooltip: "add",
+              child: Text("Add"),
+            ),
+            FloatingActionButton(
+              onPressed: () {
+                TodoModelClass? todoModel = todoBox?.get('foo'); //get by key
+                TodoModelClass? catModel = todoBox?.getAt(3); //get by index
+                List<TodoModelClass>? catModelList =
+                    todoBox?.values.toList(); //get all items in list
+
+                print(todoModel);
+                print(catModel);
+                print(catModelList);
+              },
+              tooltip: "read",
+              child: Text("Read"),
+            ),
+            FloatingActionButton(
+              onPressed: () async {
+                var catModel = TodoModelClass(
+                    "title", "description", "status", 2); //creating new object
+                await todoBox?.put(
+                    catModel.title, catModel); //putting object into hive box
+              },
+              tooltip: "Update",
+              child: Text("Update"),
+            ),
+            FloatingActionButton(
+              onPressed: () async {
+                // Box<TodoModelClass> catBox =
+                //     await HiveBoxHelperClass.openCatBox();
+                await todoBox!
+                    .delete('foo'); //delete cat with key (name) as 'foo'
+              },
+              tooltip: "Delete",
+              child: Text("Delete"),
+            ),
           ],
         ),
       ),
@@ -103,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: _incrementCounter,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
