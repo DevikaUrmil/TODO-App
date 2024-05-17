@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'package:another_flushbar/flushbar.dart';
+import 'package:another_flushbar/flushbar.dart';
 
 class Constant {}
 
@@ -28,7 +28,7 @@ bool emailValidation(String value) {
   }
 }
 
-/*topMsg(BuildContext context, String msg, int duration, bool isError) {
+topMsg(BuildContext context, String msg, int duration, bool isError) {
   Flushbar(
     backgroundColor: isError == true ? Colors.red : Colors.green,
     //title: 'Hey Ninja',
@@ -36,4 +36,4 @@ bool emailValidation(String value) {
     message: msg,
     duration: Duration(seconds: duration),
   ).show(context);
-}*/
+}

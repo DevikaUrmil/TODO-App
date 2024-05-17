@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
-import 'package:todo/View/DetailController.dart';
-import 'package:todo/View/TodoController.dart';
-import 'package:todo/View/UserController.dart';
+import 'package:todo/Controllers/DetailController.dart';
+import 'package:todo/Controllers/TodoController.dart';
+import 'package:todo/Controllers/UserController.dart';
 
 class Binding implements Bindings {
 // default dependency

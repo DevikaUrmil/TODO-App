@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo/Reusable/Reusable.dart';
 import 'package:todo/View/TodoVC.dart';
-import 'package:todo/View/UserController.dart';
+import 'package:todo/Controllers/UserController.dart';
 
 class UserVC extends GetView<UserController> {
   UserVC({Key? key}) : super(key: key);
@@ -13,10 +13,7 @@ class UserVC extends GetView<UserController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Christine"),
-        centerTitle: true,
-      ),
+      appBar: Reusable.appBar(Text("Christine")),
       body: SafeArea(
         minimum: EdgeInsets.all(5),
         child: Padding(

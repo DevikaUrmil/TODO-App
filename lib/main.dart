@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo/Binding.dart';
+import 'package:todo/Controllers/TodoController.dart';
+import 'package:todo/Controllers/UserController.dart';
 //import 'package:hive_generator/hive_generator.dart';
 //import 'package:build_runner/build_runner.dart';
 import 'package:todo/ModelClass/TodoModelClass.dart';
 import 'package:get/get.dart';
-import 'package:todo/View/DetailController.dart';
+import 'package:todo/Controllers/DetailController.dart';
 import 'package:todo/View/DetailVC.dart';
-import 'package:todo/View/TodoController.dart';
 import 'package:todo/View/TodoVC.dart';
-import 'package:todo/View/UserController.dart';
 import 'package:todo/View/UserVC.dart';
 
 void main() async {
@@ -19,7 +18,11 @@ void main() async {
   Get.lazyPut(() => TodoController(), fenix: true);
   Get.lazyPut(() => DetailController(), fenix: true);
 
+  WidgetsFlutterBinding.ensureInitialized();
+  //Directory directory = await pathProvider.getApplicationDocumentsDirectory();
+  //Hive.init(directory.path);
   Hive.registerAdapter(TodoModelClassAdapter());
+  await Hive.openBox('TODO');
 
   runApp(GetMaterialApp(
     home: UserVC(),
@@ -116,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
             FloatingActionButton(
               onPressed: () async {
                 var todoModel = TodoModelClass(
-                    "title", "description", "status", 1); //creating object
+                    "1", "title", "description", "status", 1); //creating object
                 await todoBox?.put(
                     todoModel.title, todoModel); //putting object into hive box
               },
@@ -139,8 +142,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             FloatingActionButton(
               onPressed: () async {
-                var catModel = TodoModelClass(
-                    "title", "description", "status", 2); //creating new object
+                var catModel = TodoModelClass("2", "title", "description",
+                    "status", 2); //creating new object
                 await todoBox?.put(
                     catModel.title, catModel); //putting object into hive box
               },

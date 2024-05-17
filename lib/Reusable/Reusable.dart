@@ -12,13 +12,13 @@ class Reusable {
       bool? elevation1}) {
     return AppBar(
       title: title,
-      elevation: elevation1 == true ? 0.0 : 3,
+      //elevation: elevation1 == true ? 0.0 : 3,
       centerTitle: centerTitle,
       leading: leading,
       systemOverlayStyle: britness,
       actions: action,
-      backgroundColor: bgColor ?? Colors.white,
-      iconTheme: IconThemeData(color: Palette.appColor),
+      //backgroundColor: bgColor ?? Colors.white,
+      //iconTheme: IconThemeData(color: Palette.appColor),
     );
   }
 
@@ -28,7 +28,7 @@ class Reusable {
       child: Text(
         title,
         style: TextStyle(
-          fontSize: 17,
+          fontSize: 16,
           fontWeight: FontWeight.w600,
           color: txtColor ?? Colors.black,
         ),
@@ -77,6 +77,7 @@ class TxtFieldWidget extends StatelessWidget {
   final bool? enableInteractive;
   final int? maxLength;
   final bool? autofocus;
+  final double? width;
 
   TxtFieldWidget({
     Key? key,
@@ -96,11 +97,14 @@ class TxtFieldWidget extends StatelessWidget {
     this.enableInteractive,
     this.maxLength,
     this.autofocus,
+    this.width,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: width ?? MediaQuery.of(context).size.width - 20,
+      height: 40,
       decoration: BoxDecoration(
         color: bgColor ?? Colors.white,
         borderRadius: BorderRadius.circular(5.0),
