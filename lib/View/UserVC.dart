@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo/Reusable/Reusable.dart';
@@ -15,7 +14,7 @@ class UserVC extends GetView<UserController> {
     return Scaffold(
       appBar: Reusable.appBar(Text("Christine")),
       body: SafeArea(
-        minimum: EdgeInsets.all(5),
+        minimum: const EdgeInsets.all(5),
         child: Padding(
           padding: const EdgeInsets.all(5),
           child: SingleChildScrollView(
@@ -28,7 +27,7 @@ class UserVC extends GetView<UserController> {
                     child: Image.asset("assets/profile.png"),
                   ),
                   const SizedBox(height: 40),
-                  Text(
+                  const Text(
                     "App world Infotech",
                     style: TextStyle(
                       fontSize: 16,
@@ -36,7 +35,7 @@ class UserVC extends GetView<UserController> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Text(
+                  const Text(
                     "Application Developer",
                     style: TextStyle(
                       fontSize: 16,

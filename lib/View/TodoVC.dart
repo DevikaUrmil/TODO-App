@@ -1,8 +1,5 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:todo/ModelClass/TodoModelClass.dart';
 import 'package:todo/Reusable/Reusable.dart';
 import 'package:todo/View/DetailVC.dart';
 import 'package:todo/Controllers/TodoController.dart';
@@ -57,11 +54,15 @@ class TodoVC extends GetView<TodoController> {
               children: [
                 Reusable.topLabel("Title"),
                 const SizedBox(height: 3),
-                TxtFieldWidget(),
+                TxtFieldWidget(
+                  controller: controller1.titleTxtField?.value,
+                ),
                 const SizedBox(height: 10),
                 Reusable.topLabel("Description"),
                 const SizedBox(height: 3),
-                TxtFieldWidget(),
+                TxtFieldWidget(
+                  controller: controller1.descriptionTxtField?.value,
+                ),
                 const SizedBox(height: 10),
                 Reusable.topLabel("Time"),
                 const SizedBox(height: 3),
@@ -71,7 +72,7 @@ class TodoVC extends GetView<TodoController> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Minutes"),
+                        const Text("Minutes"),
                         const SizedBox(height: 3),
                         Container(
                           width:
@@ -82,9 +83,8 @@ class TodoVC extends GetView<TodoController> {
                             borderRadius: BorderRadius.circular(5.0),
                           ),
                           child: TextField(
-                            controller: controller1.minutesTxtField,
+                            controller: controller1.minutesTxtField?.value,
                             onChanged: (String value) {
-                              print('Changed');
                               int x;
                               try {
                                 x = int.parse(value);
@@ -97,7 +97,7 @@ class TodoVC extends GetView<TodoController> {
                                 x = controller1.maxM;
                               }
 
-                              controller1.minutesTxtField?.value =
+                              controller1.minutesTxtField?.value.value =
                                   TextEditingValue(
                                 text: x.toString(),
                                 selection: TextSelection.fromPosition(
@@ -109,10 +109,7 @@ class TodoVC extends GetView<TodoController> {
                               );
                             },
                             decoration: InputDecoration(
-                              //errorText: errorText,
-
                               labelStyle: const TextStyle(fontSize: 15),
-                              //labelText: label,
                               hintStyle: const TextStyle(
                                   color: Colors.blueGrey, fontSize: 15),
                               hintText: "",
@@ -127,8 +124,6 @@ class TodoVC extends GetView<TodoController> {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(5.0),
                               ),
-                              // errorBorder: errorrTextFieldBorder(),
-                              // focusedErrorBorder: errorrTextFieldBorder(),
                             ),
                           ),
                         ),
@@ -137,7 +132,7 @@ class TodoVC extends GetView<TodoController> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Seconds"),
+                        const Text("Seconds"),
                         const SizedBox(height: 3),
                         Container(
                           width:
@@ -148,9 +143,8 @@ class TodoVC extends GetView<TodoController> {
                             borderRadius: BorderRadius.circular(5.0),
                           ),
                           child: TextField(
-                            controller: controller1.secondsTxtField,
+                            controller: controller1.secondsTxtField?.value,
                             onChanged: (String value) {
-                              print('Changed');
                               int xs;
                               try {
                                 xs = int.parse(value);
@@ -163,7 +157,7 @@ class TodoVC extends GetView<TodoController> {
                                 xs = controller1.maxS;
                               }
 
-                              controller1.secondsTxtField?.value =
+                              controller1.secondsTxtField?.value.value =
                                   TextEditingValue(
                                 text: xs.toString(),
                                 selection: TextSelection.fromPosition(
@@ -175,10 +169,7 @@ class TodoVC extends GetView<TodoController> {
                               );
                             },
                             decoration: InputDecoration(
-                              //errorText: errorText,
-
                               labelStyle: const TextStyle(fontSize: 15),
-                              //labelText: label,
                               hintStyle: const TextStyle(
                                   color: Colors.blueGrey, fontSize: 15),
                               hintText: "",
@@ -193,8 +184,6 @@ class TodoVC extends GetView<TodoController> {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(5.0),
                               ),
-                              // errorBorder: errorrTextFieldBorder(),
-                              // focusedErrorBorder: errorrTextFieldBorder(),
                             ),
                           ),
                         ),
@@ -214,21 +203,29 @@ class TodoVC extends GetView<TodoController> {
                             controller1.descriptionTxtField?.value != null &&
                             controller1.minutesTxtField?.value != null &&
                             controller1.secondsTxtField?.value != null) {
-                          var box = await Hive.openBox('TODO');
-                          print("box : $box");
-                          TodoModelClass dataModel = TodoModelClass(
-                              "1", "title", "description", "status", 1);
-                          box.add(dataModel);
+                          await controller1.addData();
+                          Get.back();
+                          controller1.todos.clear();
+                          await controller1.getData();
+
+                          topMsg(Get.context!, "TODO added successfully", 5,
+                              false);
+
+                          controller1.titleTxtField?.value.clear();
+                          controller1.descriptionTxtField?.value.clear();
+                          controller1.minutesTxtField?.value.clear();
+                          controller1.secondsTxtField?.value.clear();
                         } else {}
                       },
                     ),
                     AppButton(
                       title: "Cancel",
                       context: Get.context,
-                      onTap: () async {
-                        var box = await Hive.openBox('TODO');
-                        var items = box.values.toList().reversed.toList();
-                        print(" items $items");
+                      onTap: () {
+                        controller1.titleTxtField?.value.clear();
+                        controller1.descriptionTxtField?.value.clear();
+                        controller1.minutesTxtField?.value.clear();
+                        controller1.secondsTxtField?.value.clear();
                       },
                     ),
                   ],
@@ -247,7 +244,6 @@ class TodoVC extends GetView<TodoController> {
       height: MediaQuery.of(Get.context!).size.height - 20,
       child: Obx(
         () => ListView.separated(
-          //shrinkWrap: true,
           itemCount: controller1.todos.length,
           padding:
               const EdgeInsets.only(top: 10, bottom: 10, left: 5, right: 5),
@@ -257,7 +253,7 @@ class TodoVC extends GetView<TodoController> {
           physics: const AlwaysScrollableScrollPhysics(),
           itemBuilder: (context, index) => InkWell(
             onTap: () {
-              Get.to(DetailVC());
+              Get.to(DetailVC(objTodo: controller1.todos[index]));
             },
             child: Container(
               padding: const EdgeInsets.all(0),
@@ -298,8 +294,6 @@ class TodoVC extends GetView<TodoController> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-
-                                // const SizedBox(height: 2),
                                 SizedBox(
                                   width:
                                       MediaQuery.of(Get.context!).size.width -
@@ -310,10 +304,9 @@ class TodoVC extends GetView<TodoController> {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                //const SizedBox(height: 2),
                                 Row(
                                   children: [
-                                    Text("Status :"),
+                                    const Text("Status :"),
                                     const SizedBox(width: 10),
                                     Text(controller1.todos[index].status)
                                   ],
@@ -325,14 +318,12 @@ class TodoVC extends GetView<TodoController> {
                                       height: 20,
                                       width: 50,
                                       txtSize: 13,
-                                      onTap: () {
-                                        controller1.startTimer();
-                                      },
+                                      onTap: () {},
                                       title: "start",
                                     ),
                                     const SizedBox(width: 10),
                                     Text(
-                                      controller1.time.value,
+                                      "${controller1.getTimeMinutes(controller1.todos[index].time)} : ${controller1.getTimeSeconds(controller1.todos[index].time)}",
                                     ),
                                     const SizedBox(width: 10),
                                     AppButton(
@@ -375,7 +366,7 @@ class TodoVC extends GetView<TodoController> {
                                     ),
                                   ),
                                 ),
-                                Spacer(),
+                                const Spacer(),
                                 AppButton(
                                   title: "Delete",
                                   context: Get.context,
@@ -383,6 +374,19 @@ class TodoVC extends GetView<TodoController> {
                                   height: 20,
                                   width: 50,
                                   txtSize: 13,
+                                  onTap: () async {
+                                    print(controller1.todos[index].id);
+                                    var box = await Hive.openBox('TODO');
+                                    controller1.todos.removeWhere((item) =>
+                                        item.id == controller1.todos[index].id);
+                                    await box
+                                        .delete(controller1.todos[index].id);
+
+                                    // controller1
+                                    // .deleteData(controller1.todos[index]);
+                                    topMsg(Get.context!,
+                                        "TODO deleted successfully", 5, true);
+                                  },
                                 )
                               ],
                             ),

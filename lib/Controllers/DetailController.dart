@@ -5,8 +5,11 @@ import 'package:hive/hive.dart';
 import 'package:todo/ModelClass/TodoModelClass.dart';
 
 class DetailController extends GetxController {
-  TextEditingController minutesTxtField = TextEditingController();
-  TextEditingController secondsTxtField = TextEditingController();
+  Rx<TextEditingController>? titleTxtField = TextEditingController().obs;
+  Rx<TextEditingController>? descriptionTxtField = TextEditingController().obs;
+
+  Rx<TextEditingController>? minutesTxtField = TextEditingController().obs;
+  Rx<TextEditingController>? secondsTxtField = TextEditingController().obs;
 
   int minM = 0;
   int maxM = 5;
@@ -52,5 +55,46 @@ class DetailController extends GetxController {
       _timer?.cancel();
     }
     super.dispose();
+  }
+
+  getTimeMinutes(int time) {
+    var finalv = DateTime.fromMillisecondsSinceEpoch(time);
+    return finalv.minute;
+  }
+
+  getTimeSeconds(int time) {
+    var finalv = DateTime.fromMillisecondsSinceEpoch(time);
+    return finalv.second;
+  }
+
+  setTime(int minutesT, int secondsT) {
+    var timeStamp = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day,
+      0, // hours
+      minutesT, //minutes
+      secondsT, //seconds
+    ).millisecondsSinceEpoch;
+    print(timeStamp);
+    return timeStamp;
+  }
+
+  editData(String key) async {
+    var box = await Hive.openBox('TODO');
+    print("box : $box");
+    var timeAdd = setTime(
+      int.parse(minutesTxtField?.value.text ?? "0"),
+      int.parse(secondsTxtField?.value.text ?? "0"),
+    );
+
+    TodoModelClass dataModel = TodoModelClass(
+      key,
+      titleTxtField?.value.text ?? "",
+      descriptionTxtField?.value.text ?? "",
+      "created",
+      timeAdd,
+    );
+    box.put(dataModel.id, dataModel);
   }
 }

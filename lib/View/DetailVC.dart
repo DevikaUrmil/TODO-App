@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo/Controllers/DetailController.dart';
+import 'package:todo/Global/Constant.dart';
+import 'package:todo/ModelClass/TodoModelClass.dart';
 import 'package:todo/Reusable/Reusable.dart';
+import 'package:todo/Controllers/TodoController.dart';
 
 class DetailVC extends GetView<DetailController> {
-  DetailVC({Key? key}) : super(key: key);
+  TodoModelClass? objTodo;
+  DetailVC({Key? key, required this.objTodo}) : super(key: key);
 
   var controller1 = Get.find<DetailController>();
+  var todoController = Get.find<TodoController>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: Reusable.appBar(Text("Task 1")),
+      appBar: Reusable.appBar(Text(objTodo?.title ?? "")),
       body: SafeArea(
         minimum: const EdgeInsets.all(5),
         child: Padding(
@@ -22,22 +27,20 @@ class DetailVC extends GetView<DetailController> {
               children: [
                 label("Title"),
                 const SizedBox(height: 3),
-                Text("Task 1"),
+                Text(objTodo?.title ?? ""),
                 const SizedBox(height: 10),
                 label("Description"),
                 const SizedBox(height: 3),
-                Text("Description"),
+                Text(objTodo?.description ?? ""),
                 const SizedBox(height: 10),
                 label("Status"),
                 const SizedBox(height: 3),
-                Text("Created"),
+                Text(objTodo?.title ?? ""),
                 const SizedBox(height: 10),
                 label("Timer"),
                 const SizedBox(height: 3),
-                Obx(
-                  () => Text(
-                    controller1.time.value,
-                  ),
+                Text(
+                  "${controller1.getTimeMinutes(objTodo!.time)} : ${controller1.getTimeSeconds(objTodo!.time)}",
                 ),
                 const SizedBox(height: 30),
                 AppButton(
@@ -68,6 +71,13 @@ class DetailVC extends GetView<DetailController> {
   }
 
   bottomSheetView() {
+    controller1.titleTxtField?.value.text = objTodo?.title ?? "";
+    controller1.descriptionTxtField?.value.text = objTodo?.description ?? "";
+    controller1.minutesTxtField?.value.text =
+        controller1.getTimeMinutes(objTodo!.time).toString();
+    controller1.secondsTxtField?.value.text =
+        controller1.getTimeSeconds(objTodo!.time).toString();
+
     return Get.bottomSheet(
       Container(
         width: MediaQuery.of(Get.context!).size.width,
@@ -85,11 +95,14 @@ class DetailVC extends GetView<DetailController> {
               children: [
                 Reusable.topLabel("Title"),
                 const SizedBox(height: 3),
-                TxtFieldWidget(),
+                TxtFieldWidget(
+                  controller: controller1.titleTxtField?.value,
+                ),
                 const SizedBox(height: 10),
                 Reusable.topLabel("Description"),
                 const SizedBox(height: 3),
-                TxtFieldWidget(),
+                TxtFieldWidget(
+                    controller: controller1.descriptionTxtField?.value),
                 const SizedBox(height: 10),
                 Reusable.topLabel("Time"),
                 const SizedBox(height: 3),
@@ -99,7 +112,7 @@ class DetailVC extends GetView<DetailController> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Minutes"),
+                        const Text("Minutes"),
                         const SizedBox(height: 3),
                         Container(
                           width:
@@ -110,9 +123,8 @@ class DetailVC extends GetView<DetailController> {
                             borderRadius: BorderRadius.circular(5.0),
                           ),
                           child: TextField(
-                            controller: controller1.minutesTxtField,
+                            controller: controller1.minutesTxtField?.value,
                             onChanged: (String value) {
-                              print('Changed');
                               int x;
                               try {
                                 x = int.parse(value);
@@ -125,22 +137,19 @@ class DetailVC extends GetView<DetailController> {
                                 x = controller1.maxM;
                               }
 
-                              controller1.minutesTxtField.value =
+                              controller1.minutesTxtField?.value.value =
                                   TextEditingValue(
                                 text: x.toString(),
                                 selection: TextSelection.fromPosition(
                                   TextPosition(
-                                    offset: controller1.minutesTxtField.value
+                                    offset: controller1.minutesTxtField!.value
                                         .selection.baseOffset,
                                   ),
                                 ),
                               );
                             },
                             decoration: InputDecoration(
-                              //errorText: errorText,
-
                               labelStyle: const TextStyle(fontSize: 15),
-                              //labelText: label,
                               hintStyle: const TextStyle(
                                   color: Colors.blueGrey, fontSize: 15),
                               hintText: "",
@@ -155,8 +164,6 @@ class DetailVC extends GetView<DetailController> {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(5.0),
                               ),
-                              // errorBorder: errorrTextFieldBorder(),
-                              // focusedErrorBorder: errorrTextFieldBorder(),
                             ),
                           ),
                         ),
@@ -165,7 +172,7 @@ class DetailVC extends GetView<DetailController> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Seconds"),
+                        const Text("Seconds"),
                         const SizedBox(height: 3),
                         Container(
                           width:
@@ -176,9 +183,8 @@ class DetailVC extends GetView<DetailController> {
                             borderRadius: BorderRadius.circular(5.0),
                           ),
                           child: TextField(
-                            controller: controller1.secondsTxtField,
+                            controller: controller1.secondsTxtField?.value,
                             onChanged: (String value) {
-                              print('Changed');
                               int xs;
                               try {
                                 xs = int.parse(value);
@@ -191,22 +197,19 @@ class DetailVC extends GetView<DetailController> {
                                 xs = controller1.maxS;
                               }
 
-                              controller1.secondsTxtField.value =
+                              controller1.secondsTxtField?.value.value =
                                   TextEditingValue(
                                 text: xs.toString(),
                                 selection: TextSelection.fromPosition(
                                   TextPosition(
-                                    offset: controller1.minutesTxtField.value
+                                    offset: controller1.minutesTxtField!.value
                                         .selection.baseOffset,
                                   ),
                                 ),
                               );
                             },
                             decoration: InputDecoration(
-                              //errorText: errorText,
-
                               labelStyle: const TextStyle(fontSize: 15),
-                              //labelText: label,
                               hintStyle: const TextStyle(
                                   color: Colors.blueGrey, fontSize: 15),
                               hintText: "",
@@ -221,8 +224,6 @@ class DetailVC extends GetView<DetailController> {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(5.0),
                               ),
-                              // errorBorder: errorrTextFieldBorder(),
-                              // focusedErrorBorder: errorrTextFieldBorder(),
                             ),
                           ),
                         ),
@@ -234,11 +235,6 @@ class DetailVC extends GetView<DetailController> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // AppButton(
-                    //   title: "Play",
-                    //   context: Get.context,
-                    //   width: MediaQuery.of(Get.context!).size.width / 3 - 20,
-                    // ),
                     AppButton(
                       title: "Pause",
                       context: Get.context,
@@ -255,8 +251,46 @@ class DetailVC extends GetView<DetailController> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    AppButton(title: "Save", context: Get.context),
-                    AppButton(title: "Cancel", context: Get.context),
+                    AppButton(
+                      title: "Save",
+                      context: Get.context,
+                      onTap: () async {
+                        if (controller1.titleTxtField?.value != null &&
+                            controller1.descriptionTxtField?.value != null &&
+                            controller1.minutesTxtField?.value != null &&
+                            controller1.secondsTxtField?.value != null) {
+                          await controller1.editData(objTodo!.id);
+
+                          objTodo?.title =
+                              controller1.titleTxtField?.value.text ?? "";
+                          objTodo?.description =
+                              controller1.descriptionTxtField?.value.text ?? "";
+
+                          Get.back();
+                          Get.back();
+
+                          todoController.getData();
+
+                          topMsg(Get.context!, "TODO updated successfully", 5,
+                              false);
+
+                          controller1.titleTxtField?.value.clear();
+                          controller1.descriptionTxtField?.value.clear();
+                          controller1.minutesTxtField?.value.clear();
+                          controller1.secondsTxtField?.value.clear();
+                        } else {}
+                      },
+                    ),
+                    AppButton(
+                      title: "Cancel",
+                      context: Get.context,
+                      onTap: () {
+                        controller1.titleTxtField?.value.clear();
+                        controller1.descriptionTxtField?.value.clear();
+                        controller1.minutesTxtField?.value.clear();
+                        controller1.secondsTxtField?.value.clear();
+                      },
+                    ),
                   ],
                 ),
                 const SizedBox(height: 20),
